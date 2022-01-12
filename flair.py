@@ -564,8 +564,8 @@ def collapse(genomic_range='', corrected_reads=''):
 			stdout=open(alignout+'mapped.sam', 'w')):
 			return 1
 		subprocess.call(['mv', alignout+'mapped.sam', alignout+'sam'])
-		subprocess.call([args.salmon, 'quant', '-t', args.o+'firstpass.fa', '-o',  alignout+'salmon', \
-			'-p', args.t, '-l', 'U', '-a', alignout+'sam'], stderr=open(alignout+'salmon_stderr.txt', 'w'))
+		subprocess.call([args.salmon, 'quant', '--ont', '-t', args.o+'firstpass.fa', '-o',  alignout+'salmon', \
+			'-p', args.t, '-l', 'A', '-a', alignout+'sam'], stderr=open(alignout+'salmon_stderr.txt', 'w'))
 		count_file = alignout+'salmon/quant.sf'
 		align_files += [alignout+'sam', alignout+'salmon/quant.sf']
 	else:
