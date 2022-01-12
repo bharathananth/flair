@@ -54,7 +54,7 @@ def align():
 			sys.stderr.write('Check that read file {} exists\n'.format(r))
 			return 1
 	try:
-		mm2_command = [args.m, '-ax', 'splice', '-t', args.t, args.g]+args.r
+		mm2_command = [args.m, '-ax', 'splice', '-K1G', '-t', args.t, args.g]+args.r
 		if args.n:
 			mm2_command[3:3] = ['-uf', '-k14']
 		if str(args.N) != '0':
