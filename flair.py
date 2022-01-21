@@ -386,10 +386,9 @@ def collapse(genomic_range='', corrected_reads=''):
 		default='', help='Path to salmon executable, specify if salmon quantification is desired')
 	parser.add_argument('--temp_dir', default='', action='store', dest='temp_dir', \
 		help='directory for temporary files. use "./" to indicate current directory (default: python tempfile directory)')
-    parser.add_argument('--split', default=False, action='store_true', \
-        dest='split', \
+	parser.add_argument('--split', default=False, action='store_true', dest='split', \
         help='''split sam file of collapsed reads due memory limitations (relevant only if salmon is NOT used''')
-    parser.add_argument('-o', '--output', default='flair.collapse', \
+	parser.add_argument('-o', '--output', default='flair.collapse', \
 		action='store', dest='o', help='output file name base for FLAIR isoforms (default: flair.collapse)')
 	args, unknown = parser.parse_known_args()
 	if unknown and not args.quiet:
@@ -588,25 +587,25 @@ def collapse(genomic_range='', corrected_reads=''):
 			count_cmd += ['--generate_map', args.o+'isoform.read.map.txt']
 		if args.fusion_dist:
 			count_cmd += ['--fusion_dist', str(args.fusion_dist), ]
-        if args.split:
-            subprocess.call(['split', '-C', '30GB', '-d', alignout+'q.sam', alignout+'q.sam.'])
-            for file in os.listdir(args.temp_dir):
-                filename = os.fsdecode(file)
-                if filename.startswith(alignout+'q.sam.'):
-                    suffix = filename[-2:]
-                    iocmd = ['-s', filename, '-o', alignout + 'q.counts.' + suffix]
-                    count_cmd+=iocmd
-                    if subprocess.call(count_cmd):
-                        sys.stderr.write('Failed at counting step for isoform read support\n')
-                        return 1
-                    count_files+=[alignout + 'q.counts.' + suffix]
-                    align_files+=[filename]
-        else:
-            if subprocess.call(count_cmd):
-			    sys.stderr.write('Failed at counting step for isoform read support\n')
-			    return 1
-		    count_files = alignout+'q.counts'
-		    align_files += [alignout+'q.sam']
+		if args.split:
+			subprocess.call(['split', '-C', '30GB', '-d', alignout+'q.sam', alignout+'q.sam.'])
+			for file in os.listdir(args.temp_dir):
+				filename = os.fsdecode(file)
+				if filename.startswith(alignout+'q.sam.'):
+					suffix = filename[-2:]
+					iocmd = ['-s', filename, '-o', alignout + 'q.counts.' + suffix]
+					count_cmd+=iocmd
+					if subprocess.call(count_cmd):
+						sys.stderr.write('Failed at counting step for isoform read support\n')
+						return 1
+					count_files+=[alignout + 'q.counts.' + suffix]
+					align_files+=[filename]
+		else:
+			if subprocess.call(count_cmd):
+				sys.stderr.write('Failed at counting step for isoform read support\n')
+				return 1
+			count_files = alignout+'q.counts'
+			align_files += [alignout+'q.sam']
 
 	subprocess.call([sys.executable, path+'bin/combine_counts.py'] + count_files + [args.o+'firstpass.q.counts'])
 
