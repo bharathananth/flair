@@ -594,8 +594,7 @@ def collapse(genomic_range='', corrected_reads=''):
 				if filename.startswith(alignout+'q.sam.'):
 					suffix = filename[-2:]
 					iocmd = ['-s', filename, '-o', alignout + 'q.counts.' + suffix]
-					count_cmd+=iocmd
-					if subprocess.call(count_cmd):
+					if subprocess.call(count_cmd + iocmd):
 						sys.stderr.write('Failed at counting step for isoform read support\n')
 						return 1
 					count_files+=[alignout + 'q.counts.' + suffix]
@@ -604,10 +603,12 @@ def collapse(genomic_range='', corrected_reads=''):
 			if subprocess.call(count_cmd):
 				sys.stderr.write('Failed at counting step for isoform read support\n')
 				return 1
-			count_files = alignout+'q.counts'
+			count_files = [alignout+'q.counts']
 			align_files += [alignout+'q.sam']
-
-	subprocess.call([sys.executable, path+'bin/combine_counts.py'] + count_files + [args.o+'firstpass.q.counts'])
+	
+	if subprocess.call([sys.executable, path+'bin/combine_counts.py'] + count_files + [args.o+'firstpass.q.counts']):
+		sys.stderr.write('Failed at combining counts for transcripts\n')
+		return 1
 
 	if not args.quiet: sys.stderr.write('Filtering isoforms by read coverage\n')
 	match_count_cmd = [sys.executable, path+'bin/match_counts.py', args.o+'firstpass.q.counts', \
