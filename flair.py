@@ -591,16 +591,17 @@ def collapse(genomic_range='', corrected_reads=''):
 			subprocess.call(['split', '-C', '30GB', '-d', alignout+'q.sam', alignout+'q.sam.'])
 			for file in os.listdir(args.temp_dir):
 				filename = os.fsdecode(file)
-				if filename.startswith(alignout+'q.sam.'):
+				if filename.startswith(tempfile_name +'firstpass.' +'q.sam.'):
 					suffix = filename[-2:]
-					iocmd = ['-s', filename, '-o', alignout + 'q.counts.' + suffix]
+					iocmd = ['-s', args.temp_dir + filename, '-o', alignout + 'q.counts.' + suffix]
 					if subprocess.call(count_cmd + iocmd):
 						sys.stderr.write('Failed at counting step for isoform read support\n')
 						return 1
 					count_files+=[alignout + 'q.counts.' + suffix]
 					align_files+=[filename]
 		else:
-			if subprocess.call(count_cmd):
+			iocmd = ['-s', alignout + 'q.sam', '-o', alignout + 'q.counts']
+			if subprocess.call(count_cmd + iocmd):
 				sys.stderr.write('Failed at counting step for isoform read support\n')
 				return 1
 			count_files = [alignout+'q.counts']
