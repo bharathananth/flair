@@ -218,3 +218,23 @@ def collapse(genomic_range='', corrected_reads=''):
 				stdout=open(args.o+'isoforms.gtf', 'w'))
 
 path = '/'.join(os.path.realpath(__file__).split("/")[:-1])+'/'
+if len(sys.argv) < 2:
+	sys.stderr.write('usage: python flair.py <mode> --help \n')
+	sys.stderr.write('modes: align, correct, collapse, quantify, diffExp, diffSplice\n')
+	sys.stderr.write('Multiple modules can be run when specified using numbers, e.g.:\n')
+	sys.stderr.write('python flair.py 1234 ...\n')
+	sys.exit(1)
+else:
+	mode = sys.argv[1].lower()
+
+aligned_reads, corrected_reads, isoforms, isoform_sequences, counts_matrix = [0]*5
+
+if mode == 'collapse' or ('3' in mode and '3.5' not in mode):
+	if corrected_reads:
+		status = collapse(corrected_reads=corrected_reads)
+	else:
+		status = collapse()
+	if status == 1:
+		sys.exit(1)
+	else:
+		isoforms, isoform_sequences = status
