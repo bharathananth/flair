@@ -101,7 +101,7 @@ def collapse(genomic_range='', corrected_reads=''):
 
 	# housekeeping stuff
 	tempfile_dir = tempfile.NamedTemporaryFile().name
-	tempfile_name = tempfile_dir[tempfile_dir.rfind('/')+1:]+'.'
+	tempfile_name = 'tmpvcto_vk7'+'.'
 	if args.temp_dir == '':
 		args.temp_dir = tempfile_dir+'/'
 	if not os.path.isdir(args.temp_dir):  # make temporary directory
@@ -146,6 +146,9 @@ def collapse(genomic_range='', corrected_reads=''):
 
 	alignout = args.temp_dir + tempfile_name +'firstpass.'
 
+	print(alignout)
+	print(args)
+
 	# count the number of supporting reads for each first-pass isoform
 	if args.salmon:  # use salmon to count
 		if subprocess.call([args.sam, 'view', '-F', '4', '-h', '-S', alignout+'sam'], \
@@ -163,6 +166,7 @@ def collapse(genomic_range='', corrected_reads=''):
 				stdout=open(alignout+'q.sam', 'w'), stderr=open(alignout+'q.samtools_stderr', 'w'))
 			align_files += [alignout+'sam']
 		else:
+			print("at move")
 			subprocess.call(['mv', alignout+'sam', alignout+'q.sam'])
 		count_cmd = [sys.executable, path+'bin/count_sam_transcripts.py', '-t', args.t, '--quality', args.quality]
 		if args.stringent:
