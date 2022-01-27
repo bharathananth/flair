@@ -177,7 +177,8 @@ def collapse(genomic_range='', corrected_reads=''):
 		if args.split:
 			#subprocess.call(['split', '-C', '30GB', '-d', alignout+'q.sam', alignout+'q.sam.'])
 			p1 = subprocess.Popen('grep -v ^@ ' + alignout+'q.sam', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			cmd = shlex.split('split -d -C 30G --filter="{ ' + args.sam + ' view -H ' + alignout + 'q.sam; cat; } > $FILE" - ' + alignout + 'r.sam.')
+			filter_cmd = '{ ' + args.sam + ' view -H ' + alignout + 'q.sam; cat; } > $FILE'
+			cmd = ('split -d -C 30G --filter={} - ' + tempfile_name + 'firstpass.' + 'r.sam.').format(shlex.quote(filter_cmd))
 			print(cmd) 
 			p2 = subprocess.Popen(cmd, shell=True, stdin=p1.stdout)
 			p1.stdout.close()
