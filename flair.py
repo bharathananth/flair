@@ -6,6 +6,7 @@ import subprocess
 import os
 import tempfile
 import glob
+import shlex
 
 
 def align():
@@ -588,7 +589,13 @@ def collapse(genomic_range='', corrected_reads=''):
 		if args.fusion_dist:
 			count_cmd += ['--fusion_dist', str(args.fusion_dist), ]
 		if args.split:
-			subprocess.call(['split', '-C', '30GB', '-d', alignout+'q.sam', alignout+'q.sam.'])
+			p1 = subprocess.Popen('grep -v ^@ ' + alignout+'q.sam', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			filter_cmd = '{ ' + args.sam + ' view -H ' + alignout + 'q.sam; cat; } > $FILE'
+			cmd = ('split -d -C 30G --filter={} - ' + alignout + 'q.sam.').format(shlex.quote(filter_cmd))
+			p2 = subprocess.Popen(cmd, shell=True, stdin=p1.stdout)
+			p1.stdout.close()
+			out, err = p2.communicate()
+
 			for file in os.listdir(args.temp_dir):
 				filename = os.fsdecode(file)
 				if filename.startswith(tempfile_name +'firstpass.' +'q.sam.'):
