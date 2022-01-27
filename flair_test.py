@@ -175,25 +175,24 @@ def collapse(genomic_range='', corrected_reads=''):
 		if args.fusion_dist:
 			count_cmd += ['--fusion_dist', str(args.fusion_dist), ]
 		if args.split:
-			#subprocess.call(['split', '-C', '30GB', '-d', alignout+'q.sam', alignout+'q.sam.'])
-			p1 = subprocess.Popen('grep -v ^@ ' + alignout+'q.sam', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			filter_cmd = '{ ' + args.sam + ' view -H ' + alignout + 'q.sam; cat; } > $FILE'
-			cmd = ('split -d -C 30G --filter={} - ' + alignout + 'r.sam.').format(shlex.quote(filter_cmd))
-			print(cmd) 
-			p2 = subprocess.Popen(cmd, shell=True, stdin=p1.stdout)
-			p1.stdout.close()
-			out, err = p2.communicate()
+			# p1 = subprocess.Popen('grep -v ^@ ' + alignout+'q.sam', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			# filter_cmd = '{ ' + args.sam + ' view -H ' + alignout + 'q.sam; cat; } > $FILE'
+			# cmd = ('split -d -C 30G --filter={} - ' + alignout + 'q.sam.').format(shlex.quote(filter_cmd))
+			# print(cmd) 
+			# p2 = subprocess.Popen(cmd, shell=True, stdin=p1.stdout)
+			# p1.stdout.close()
+			# out, err = p2.communicate()
 
 			for file in os.listdir(args.temp_dir):
 				filename = os.fsdecode(file)
-				if filename.startswith(tempfile_name +'firstpass.' +'r.sam.'):
+				if filename.startswith(tempfile_name +'firstpass.' +'q.sam.'):
 					suffix = filename[-2:]
 					print(suffix)
 					iocmd = ['-s', args.temp_dir + filename, '-o', alignout + 'r.counts.' + suffix]
 					if subprocess.call(count_cmd + iocmd):
 						sys.stderr.write('Failed at counting step for isoform read support\n')
 						return 1
-					count_files+=[alignout + 'r.counts.' + suffix]
+					count_files+=[alignout + 'q.counts.' + suffix]
 					align_files+=[filename]
 		else:
 			iocmd = ['-s', alignout + 'q.sam', '-o', alignout + 'q.counts']
@@ -203,12 +202,12 @@ def collapse(genomic_range='', corrected_reads=''):
 			count_files = [alignout+'q.counts']
 			align_files += [alignout+'q.sam']
 	print(count_files)
-	if subprocess.call([sys.executable, path+'bin/combine_counts.py'] + count_files + [args.o+'firstpass.r.counts']):
+	if subprocess.call([sys.executable, path+'bin/combine_counts.py'] + count_files + [args.o+'firstpass.q.counts']):
 		sys.stderr.write('Failed at combining counts for transcripts\n')
 		return 1
 
 	if not args.quiet: sys.stderr.write('Filtering isoforms by read coverage\n')
-	match_count_cmd = [sys.executable, path+'bin/match_counts.py', args.o+'firstpass.r.counts', \
+	match_count_cmd = [sys.executable, path+'bin/match_counts.py', args.o+'firstpass.q.counts', \
 		args.o+'firstpass'+ext, str(min_reads), args.o+'isoforms'+ext]
 	if args.generate_map:
 		match_count_cmd += ['--generate_map', args.o+'isoform.read.map.txt']
