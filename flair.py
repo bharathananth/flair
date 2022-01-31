@@ -554,7 +554,7 @@ def collapse(genomic_range='', corrected_reads=''):
 	alignout = args.temp_dir + tempfile_name +'firstpass.'
 	try:
 		args.mm2_args = args.mm2_args.split(',') if args.mm2_args else []
-		if subprocess.call([args.m, '-ax', 'map-ont', '-t', args.t, '-N', '4'] + args.mm2_args + [args.o+'firstpass.fa'] + args.r, \
+		if subprocess.call([args.m, '-a', '-t', args.t, '-N', '4'] + args.mm2_args + [args.o+'firstpass.fa'] + args.r, \
 			stdout=open(alignout+'sam', 'w'), stderr=open(alignout+'mm2_stderr', 'w')):
 			return 1
 	except Exception as e:
